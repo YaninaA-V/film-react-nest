@@ -1,29 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Order, OrderDocument } from '../order/order.model';
+import { Order } from '../order/order.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateOrderDto } from '../order/dto/order.dto';
 
 @Injectable()
 export class OrderRepository {
   constructor(
-    @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
   ) {}
 
-  async create(orderData: { filmId: string; seats: string[]; bookedAt: Date }) {
-    const order = new this.orderModel({
-      ...orderData,
+  async create(orderData: CreateOrderDto): Promise<Order> {
+    const order = this.orderRepository.create({
+      film: { id: orderData.filmId },
+      schedule: { id: orderData.sessionId },
+      seats: orderData.seats,
       bookedAt: new Date(),
+      daytime: '',
     });
-    return order.save();
-  }
-
-  async createMany(ordersData: Partial<Order>[]): Promise<OrderDocument[]> {
-    const ordersWithDates = ordersData.map((order) => ({
-      ...order,
-      bookedAt: order.bookedAt || new Date(),
-    }));
-    return this.orderModel.insertMany(ordersWithDates) as unknown as Promise<
-      OrderDocument[]
-    >;
+    return this.orderRepository.save(order);
   }
 }

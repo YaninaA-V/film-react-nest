@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Header, Param } from '@nestjs/common';
 import { FilmService } from './film.service';
 import { FilmDto } from './dto/films.dto';
 import { ScheduleDto } from './dto/schedule.dto';
@@ -13,6 +13,7 @@ export class FilmController {
   }
 
   @Get(':id')
+  @Header('Content-Type', 'application/json')
   async getFilm(@Param('id') id: string): Promise<FilmDto> {
     return this.filmsService.getFilm(id);
   }

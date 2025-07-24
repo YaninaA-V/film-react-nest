@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { FilmDto } from './dto/films.dto';
 import { ScheduleDto } from './dto/schedule.dto';
 import { FilmRepository } from '../repository/films.repository';
-import { FilmDocument } from './film.model';
+import { Film } from './film.entity';
 
 @Injectable()
 export class FilmService {
@@ -33,16 +33,16 @@ export class FilmService {
     }
 
     return {
-      total: film.schedule.length,
-      items: film.schedule.map((scheduleItem) =>
+      total: film.schedules.length,
+      items: film.schedules.map((scheduleItem) =>
         this.toScheduleDto(scheduleItem),
       ),
     };
   }
 
-  private toFilmDto(film: FilmDocument): FilmDto {
+  private toFilmDto(film: Film): FilmDto {
     return {
-      id: film._id.toString(),
+      id: film.id,
       title: film.title,
       description: film.description,
       rating: film.rating,
@@ -50,9 +50,10 @@ export class FilmService {
       about: film.about,
       image: film.image,
       cover: film.cover,
-      schedule: film.schedule.map((scheduleItem) =>
-        this.toScheduleDto(scheduleItem),
-      ),
+      schedule:
+        film.schedules.map((scheduleItem) =>
+          this.toScheduleDto(scheduleItem),
+        ) || [],
     };
   }
 
