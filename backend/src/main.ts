@@ -15,6 +15,7 @@ async function bootstrap() {
     prefix: '/public/',
     index: false,
   });
+  app.setGlobalPrefix('api/afisha');
   await app.listen(3000);
 }
 bootstrap();

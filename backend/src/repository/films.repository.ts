@@ -1,102 +1,90 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { Film, FilmDocument } from '../films/film.model';
+import { Film } from '../films/film.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Schedule } from '../films/schedule.entity';
 
 @Injectable()
 export class FilmRepository {
-  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) {}
+  constructor(
+    @InjectRepository(Film)
+    private filmRepository: Repository<Film>,
+    @InjectRepository(Schedule)
+    private scheduleRepository: Repository<Schedule>,
+  ) {}
 
-  async findAll(): Promise<FilmDocument[]> {
-    return this.filmModel.find().exec();
+  async findAll(): Promise<Film[]> {
+    return this.filmRepository.find({ relations: ['schedules'] });
   }
 
-  async findByID(id: string): Promise<FilmDocument | null> {
-    return this.filmModel.findById(id).exec();
+  async findByID(id: string): Promise<Film | null> {
+    return this.filmRepository.findOne({
+      where: { id },
+      relations: ['schedules'],
+    });
   }
 
-  async create(filmData: Partial<Film>): Promise<FilmDocument> {
-    const createdFilm = new this.filmModel(filmData);
-    return createdFilm.save();
+  async create(filmData: Partial<Film>): Promise<Film> {
+    const film = this.filmRepository.create(filmData);
+    return this.filmRepository.save(film);
   }
 
-  async update(
-    id: string,
-    filmData: Partial<Film>,
-  ): Promise<FilmDocument | null> {
-    return this.filmModel.findByIdAndUpdate(id, filmData, { new: true }).exec();
+  async update(id: string, filmData: Partial<Film>): Promise<Film | null> {
+    await this.filmRepository.update(id, filmData);
+    return this.findByID(id);
   }
 
   async delete(id: string): Promise<void> {
-    await this.filmModel.findByIdAndDelete(id).exec();
+    await this.filmRepository.delete(id);
   }
 
   async addScheduleItem(
     filmId: string,
     scheduleItem: any,
-  ): Promise<FilmDocument | null> {
-    return this.filmModel
-      .findByIdAndUpdate(
-        { id: filmId },
-        { $push: { schedule: scheduleItem } },
-        { new: true },
-      )
-      .exec();
+  ): Promise<Film | null> {
+    const film = await this.findByID(filmId);
+    if (!film) return null;
+
+    const newSchedule = this.scheduleRepository.create({
+      ...scheduleItem,
+      film,
+    });
+    await this.scheduleRepository.save(newSchedule);
+
+    return this.findByID(filmId);
   }
 
   async updateScheduleItem(
-    filmId: string,
-    scheduleItemId: string,
-    updateData: any,
-  ): Promise<FilmDocument | null> {
-    return this.filmModel
-      .findOneAndUpdate(
-        { id: filmId, 'schedule._id': scheduleItemId },
-        { $set: { 'schedule.$': updateData } },
-        { new: true },
-      )
-      .exec();
+    scheduleId: string,
+    updateData: Partial<Schedule>,
+  ): Promise<Schedule | null> {
+    await this.scheduleRepository.update(scheduleId, updateData);
+    return this.scheduleRepository.findOneBy({ id: scheduleId });
   }
 
-  async addTakenSeats(
-    filmId: string,
-    scheduleId: string,
-    seatKeys: string[],
-  ): Promise<FilmDocument | null> {
-    return this.filmModel
-      .findByIdAndUpdate(
-        filmId,
-        {
-          $addToSet: {
-            'schedule.$[elem].takenSeats': { $each: seatKeys },
-          },
-        },
-        {
-          arrayFilters: [{ 'elem._id': new Types.ObjectId(scheduleId) }],
-          new: true,
-        },
-      )
-      .exec();
+  async addTakenSeats(scheduleId: string, seats: string[]): Promise<void> {
+    const schedule = await this.scheduleRepository.findOne({
+      where: { id: scheduleId },
+    });
+    if (!schedule) {
+      throw new Error('Расписание не найдено');
+    }
+    schedule.takenSeats = [...(schedule.takenSeats || []), ...seats];
+    await this.scheduleRepository.save(schedule);
   }
 
   async removeTakenSeats(
-    filmId: string,
     scheduleId: string,
     seatKeys: string[],
-  ): Promise<FilmDocument | null> {
-    return this.filmModel
-      .findByIdAndUpdate(
-        filmId,
-        {
-          $pull: {
-            'schedule.$[elem].takenSeats': { $in: seatKeys },
-          },
-        },
-        {
-          arrayFilters: [{ 'elem._id': new Types.ObjectId(scheduleId) }],
-          new: true,
-        },
-      )
-      .exec();
+  ): Promise<Schedule | null> {
+    const schedule = await this.scheduleRepository.findOneBy({
+      id: scheduleId,
+    });
+    if (!schedule) return null;
+
+    schedule.takenSeats = schedule.takenSeats.filter(
+      (seat) => !seatKeys.includes(seat),
+    );
+    return this.scheduleRepository.save(schedule);
   }
 }
