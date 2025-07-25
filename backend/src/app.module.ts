@@ -5,7 +5,6 @@ import * as path from 'node:path';
 import { configProvider } from './app.config.provider';
 import { FilmsModule } from './films/film.module';
 import { OrderModule } from './order/order.module';
-import { ProxyController } from './app.controller';
 import { DatabaseModule } from './database.module';
 
 @Module({
@@ -23,7 +22,6 @@ import { DatabaseModule } from './database.module';
     FilmsModule,
     OrderModule,
   ],
-  controllers: [ProxyController],
   providers: [configProvider],
 })
 export class AppModule {}

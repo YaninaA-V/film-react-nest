@@ -1,27 +1,35 @@
-import { Controller, Get, Header, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  Param,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { FilmService } from './film.service';
 import { FilmDto } from './dto/films.dto';
-import { ScheduleDto } from './dto/schedule.dto';
 
-@Controller('films')
+@Controller()
 export class FilmController {
   constructor(private readonly filmsService: FilmService) {}
 
-  @Get()
-  async getFilms(): Promise<{ total: number; items: FilmDto[] }> {
-    return this.filmsService.getFilms();
+  @Get(['/api/afisha/films', '/films'])
+  async getFilms() {
+    try {
+      return await this.filmsService.getFilms();
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Ошибка доступа');
+    }
+  }
+
+  @Get(['/afisha/films/:id/schedule', '/films/:id/schedule'])
+  async getFilmSchedule(@Param('id') id: string) {
+    return this.filmsService.getSchedule(id);
   }
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
   async getFilm(@Param('id') id: string): Promise<FilmDto> {
     return this.filmsService.getFilm(id);
-  }
-
-  @Get(':id/schedule')
-  async getSchedule(
-    @Param('id') id: string,
-  ): Promise<{ total: number; items: ScheduleDto[] }> {
-    return this.filmsService.getSchedule(id);
   }
 }

@@ -30,6 +30,10 @@ export class Film {
   @Column()
   description: string;
 
-  @OneToMany(() => Schedule, (schedule) => schedule.film)
+  @OneToMany(() => Schedule, (schedule) => schedule.film, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   schedules: Schedule[];
 }
