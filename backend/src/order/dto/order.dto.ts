@@ -7,4 +7,5 @@ export class CreateOrderDto {
 export class OrderResponseDto {
   success: boolean;
   message?: string;
+  orderId?: string;
 }

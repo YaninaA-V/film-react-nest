@@ -12,13 +12,9 @@ export class OrderService {
 
   async createOrder(orderData: CreateOrderDto): Promise<OrderResponseDto> {
     try {
-      await this.orderRepository.create({
-        filmId: orderData.filmId,
-        seats: orderData.seats,
-        bookedAt: new Date(),
-      });
+      const order = await this.orderRepository.create(orderData);
+
       await this.filmRepository.addTakenSeats(
-        orderData.filmId,
         orderData.sessionId,
         orderData.seats,
       );
@@ -26,12 +22,13 @@ export class OrderService {
       return {
         success: true,
         message: 'Заказ успешно создан',
+        orderId: order.id,
       };
     } catch (error) {
       console.error('Order creation error:', error);
       return {
         success: false,
-        message: 'Ошибка при формировании заказа',
+        message: 'Ошибка при создании заказа: ' + error.message,
       };
     }
   }
