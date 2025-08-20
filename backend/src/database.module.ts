@@ -2,25 +2,25 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Film } from './films/film.entity';
 import { Schedule } from './films/schedule.entity';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: configService.get<'postgres'>('DATABASE_DRIVER'),
-        host: configService.get<string>('DATABASE_HOST'),
-        port: configService.get<number>('DATABASE_PORT'),
-        username: configService.get<string>('DATABASE_USERNAME'),
-        password: configService.get<string>('DATABASE_PASSWORD'),
-        database: configService.get<string>('DATABASE_NAME'),
+      useFactory: () => ({
+        type: 'postgres',
+        host: process.env.DATABASE_HOST || 'db',
+        port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+        username: process.env.DATABASE_USERNAME || 'user_for_film',
+        password: process.env.DATABASE_PASSWORD || 'filmnest',
+        database: process.env.DATABASE_NAME || 'film_nest_db',
         entities: [Film, Schedule],
         synchronize: true,
         logging: true,
+        retryDelay: 5000,
+        retryAttempts: 10,
         extra: {
-          trustServerCertificate: true,
+          connectionLimit: 5,
+          poolSize: 30,
         },
       }),
     }),

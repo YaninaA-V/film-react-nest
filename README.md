@@ -31,6 +31,40 @@ MongoDB должна быть установлена и запущена.
 
 Для проверки отправьте тестовый запрос с помощью Postman или `curl`.
 
+## Деплой проекта 
+
+Проект успешно запущен на удаленном сервере и доступен по следующим ссылкам:
+
+### Основные приложения
+- **Сайт** http://filmnest.nomorepartiessbs.ru/
+- **API** http://filmnest.nomorepartiessbs.ru/api/afisha/films
+
+### Инструменты администрирования
+- **PgAdmin:** http://filmnest.nomorepartiessbs.ru:8080
+  - Логин: `filmnest@localhost.net`
+  - Пароль: `filmnest`
+
+### БД
+- **Хост:** `filmnest.nomorepartiessbs.ru`
+- **Порт:** `5432` (доступен только через SSH tunnel)
+- **База:** `film_nest_db`
+- **Пользователь:** `user_for_film`
+
+### SSH доступ 
+ssh yanina@filmnest.nomorepartiessbs.ru
+
+## Используемые технологии
+
+- Frontend: React + Vite + TypeScript
+
+- Backend: NestJS + PostgreSQL
+
+- Infrastructure: Docker + Docker Compose
+
+- Deployment: Yandex Cloud VM
+
+- Domain: domain.nomoreparties.site
+
 
 
 
