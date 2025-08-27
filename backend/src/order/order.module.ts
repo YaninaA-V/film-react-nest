@@ -5,12 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Film } from '../films/film.entity';
 import { Order } from './order.entity';
 import { Schedule } from '../films/schedule.entity';
-import { OrderRepository } from '../repository/order.repository';
 import { FilmRepository } from '../repository/films.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, Film, Schedule])],
   controllers: [OrderController],
-  providers: [OrderService, OrderRepository, FilmRepository],
+  providers: [OrderService, FilmRepository],
 })
 export class OrderModule {}

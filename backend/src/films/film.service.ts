@@ -3,6 +3,7 @@ import { FilmDto } from './dto/films.dto';
 import { ScheduleDto } from './dto/schedule.dto';
 import { FilmRepository } from '../repository/films.repository';
 import { Film } from './film.entity';
+import { Schedule } from './schedule.entity';
 
 @Injectable()
 export class FilmService {
@@ -31,16 +32,15 @@ export class FilmService {
     if (!film) {
       throw new NotFoundException('Фильм не найден');
     }
+    const schedules = await this.filmRepository.findSchedulesByFilmId(id);
 
     return {
-      total: film.schedules.length,
-      items: film.schedules.map((scheduleItem) =>
-        this.toScheduleDto(scheduleItem),
-      ),
+      total: schedules.length,
+      items: schedules.map((scheduleItem) => this.toScheduleDto(scheduleItem)),
     };
   }
 
-  private toFilmDto(film: Film): FilmDto {
+  private toFilmDto(film: Film, schedules: Schedule[] = []): FilmDto {
     return {
       id: film.id,
       title: film.title,
@@ -50,19 +50,21 @@ export class FilmService {
       about: film.about,
       image: film.image,
       cover: film.cover,
-      schedule:
-        film.schedules.map((scheduleItem) =>
-          this.toScheduleDto(scheduleItem),
-        ) || [],
+      schedule: schedules.map((scheduleItem) =>
+        this.toScheduleDto(scheduleItem),
+      ),
     };
   }
 
-  private toScheduleDto(scheduleItem: any): ScheduleDto {
+  private toScheduleDto(scheduleItem: Schedule): ScheduleDto {
     return {
-      date: scheduleItem.date,
-      time: scheduleItem.time,
+      id: scheduleItem.id,
+      daytime: scheduleItem.daytime,
       hall: scheduleItem.hall,
-      takenSeats: scheduleItem.takenSeats || [],
+      rows: scheduleItem.rows,
+      seats: scheduleItem.seats,
+      price: scheduleItem.price,
+      taken: scheduleItem.taken,
     };
   }
 }

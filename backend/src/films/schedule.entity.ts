@@ -1,22 +1,31 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Film } from './film.entity';
 
-@Entity()
+@Entity('schedule')
 export class Schedule {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ default: '2025-07-25' })
-  date: string;
+  @Column({ name: 'filmId' })
+  filmId: string;
 
-  @Column({ default: '01:00' })
-  time: string;
+  @Column({ name: 'daytime', type: 'timestamptz' })
+  daytime: string;
 
-  @Column({ default: '' })
-  hall: string;
+  @Column({ name: 'hall' })
+  hall: number;
 
-  @Column('simple-array', { default: '' })
-  takenSeats: string[];
+  @Column({ name: 'rows' })
+  rows: number;
+
+  @Column({ name: 'seats' })
+  seats: number;
+
+  @Column({ name: 'price' })
+  price: string;
+
+  @Column({ name: 'taken', type: 'text', array: true, default: [] })
+  taken: string[];
 
   @ManyToOne(() => Film, (film) => film.schedules)
   film: Film;

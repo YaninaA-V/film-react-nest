@@ -85,4 +85,3 @@ INSERT INTO public.schedule (id, daytime, hall, rows, seats, price, taken, "film
 INSERT INTO public.schedule (id, daytime, hall, rows, seats, price, taken, "filmId") VALUES ('9d3d3914-ea59-46a0-80a2-4e320e82956a', '2024-06-30T12:00:53+03:00', 0, 5, 10, 350, '', '92b8a2a7-ab6b-4fa9-915b-d27945865e39');
 INSERT INTO public.schedule (id, daytime, hall, rows, seats, price, taken, "filmId") VALUES ('5c68663d-1a71-401c-9214-e79af571c347', '2024-06-30T16:00:53+03:00', 1, 5, 10, 350, '', '92b8a2a7-ab6b-4fa9-915b-d27945865e39');
 INSERT INTO public.schedule (id, daytime, hall, rows, seats, price, taken, "filmId") VALUES ('2644a72a-6f17-4c61-a405-9c48bb0ea682', '2024-06-30T18:00:53+03:00', 2, 5, 10, 350, '', '92b8a2a7-ab6b-4fa9-915b-d27945865e39');
-

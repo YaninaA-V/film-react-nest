@@ -1,6 +1,9 @@
 export class ScheduleDto {
-  date: Date;
-  time: string;
-  hall: string;
-  takenSeats: string[];
+  id: string;
+  daytime: string;
+  hall: number;
+  rows: number;
+  seats: number;
+  price: string;
+  taken: string[];
 }

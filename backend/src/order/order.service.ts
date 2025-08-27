@@ -1,31 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderDto, OrderResponseDto } from './dto/order.dto';
-import { OrderRepository } from '../repository/order.repository';
+import { CreateOrderDto } from './dto/order.dto';
 import { FilmRepository } from '../repository/films.repository';
 
 @Injectable()
 export class OrderService {
-  constructor(
-    private readonly orderRepository: OrderRepository,
-    private readonly filmRepository: FilmRepository,
-  ) {}
+  constructor(private readonly filmRepository: FilmRepository) {}
 
-  async createOrder(orderData: CreateOrderDto): Promise<OrderResponseDto> {
+  async createOrder(orderData: CreateOrderDto): Promise<any> {
     try {
-      const order = await this.orderRepository.create(orderData);
-
-      await this.filmRepository.addTakenSeats(
-        orderData.sessionId,
-        orderData.seats,
-      );
+      for (const ticket of orderData.tickets) {
+        await this.filmRepository.addTakenSeats(ticket.session, [
+          `${ticket.row}:${ticket.seat}`,
+        ]);
+      }
 
       return {
-        success: true,
-        message: 'Заказ успешно создан',
-        orderId: order.id,
+        total: orderData.tickets.length,
+        items: orderData.tickets.map((ticket) => ({
+          film: ticket.film,
+          session: ticket.session,
+          time: ticket.time,
+          day: ticket.day,
+          daytime: ticket.daytime,
+          price: ticket.price,
+          row: ticket.row,
+          seat: ticket.seat,
+        })),
       };
     } catch (error) {
-      console.error('Order creation error:', error);
       return {
         success: false,
         message: 'Ошибка при создании заказа: ' + error.message,

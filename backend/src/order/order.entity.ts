@@ -2,7 +2,7 @@ import { Film } from '../films/film.entity';
 import { Schedule } from '../films/schedule.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('order')
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -21,6 +21,12 @@ export class Order {
 
   @Column('float')
   price: number;
+
+  @Column()
+  email: string;
+
+  @Column()
+  phone: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   bookedAt: Date;

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Film } from './films/film.entity';
 import { Schedule } from './films/schedule.entity';
+import { Order } from './order/order.entity';
 
 @Module({
   imports: [
@@ -13,8 +14,9 @@ import { Schedule } from './films/schedule.entity';
         username: process.env.DATABASE_USERNAME || 'user_for_film',
         password: process.env.DATABASE_PASSWORD || 'filmnest',
         database: process.env.DATABASE_NAME || 'film_nest_db',
-        entities: [Film, Schedule],
-        synchronize: true,
+        cache: false,
+        entities: [Film, Schedule, Order],
+        synchronize: false,
         logging: true,
         retryDelay: 5000,
         retryAttempts: 10,
