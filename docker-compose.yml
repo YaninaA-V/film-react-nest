@@ -10,7 +10,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}      
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/db-init:/docker-entrypoint-initdb.d
+      - ./db-init:/docker-entrypoint-initdb.d
     networks:
       - internal
 
