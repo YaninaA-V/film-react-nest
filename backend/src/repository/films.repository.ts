@@ -14,13 +14,12 @@ export class FilmRepository {
   ) {}
 
   async findAll(): Promise<Film[]> {
-    return this.filmRepository.find({ relations: ['schedules'] });
+    return this.filmRepository.find();
   }
 
   async findByID(id: string): Promise<Film | null> {
     return this.filmRepository.findOne({
       where: { id },
-      relations: ['schedules'],
     });
   }
 
@@ -36,6 +35,12 @@ export class FilmRepository {
 
   async delete(id: string): Promise<void> {
     await this.filmRepository.delete(id);
+  }
+
+  async findSchedulesByFilmId(filmId: string): Promise<Schedule[]> {
+    return this.scheduleRepository.find({
+      where: { filmId },
+    });
   }
 
   async addScheduleItem(
@@ -69,7 +74,10 @@ export class FilmRepository {
     if (!schedule) {
       throw new Error('Расписание не найдено');
     }
-    schedule.takenSeats = [...(schedule.takenSeats || []), ...seats];
+    const currentTaken = schedule.taken || [];
+    const newTaken = [...currentTaken, ...seats];
+    schedule.taken = newTaken;
+
     await this.scheduleRepository.save(schedule);
   }
 
@@ -82,9 +90,10 @@ export class FilmRepository {
     });
     if (!schedule) return null;
 
-    schedule.takenSeats = schedule.takenSeats.filter(
-      (seat) => !seatKeys.includes(seat),
-    );
+    const takenArray = schedule.taken;
+    const filteredTaken = takenArray.filter((seat) => !seatKeys.includes(seat));
+    schedule.taken = filteredTaken;
+
     return this.scheduleRepository.save(schedule);
   }
 }

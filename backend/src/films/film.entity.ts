@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Schedule } from './schedule.entity';
 
-@Entity()
+@Entity('film')
 export class Film {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -31,6 +31,7 @@ export class Film {
   description: string;
 
   @OneToMany(() => Schedule, (schedule) => schedule.film, {
+    eager: true,
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
